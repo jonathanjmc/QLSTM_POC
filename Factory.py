@@ -110,11 +110,19 @@ class QLSTM(nn.Module):
             #qml.templates.AngleEmbedding(features, wires=wires_type)
             ry_params = [torch.arctan(feature) for feature in features]
             rz_params = [torch.arctan(feature**2) for feature in features]
-            for i in range(self.n_qubits):
+            print(f"Length of ry_params: {len(ry_params)}, Length of rz_params: {len(rz_params)}, Number of qubits: {self.n_qubits}")
+
+            for i in range(self.features):
                 qml.Hadamard(wires=wires_type[i])
                 qml.RY(ry_params[i], wires=wires_type[i])
-                qml.RZ(ry_params[i], wires=wires_type[i])
-        
+                qml.RZ(rz_params[i], wires=wires_type[i])
+
+            # for i in range(self.n_qubits):
+            #     qml.Hadamard(wires=wires_type[i])
+            #     qml.RY(features[i], wires=wires_type[i])
+            #     qml.RZ(features[i]**2, wires=wires_type[i])
+
+            
             #Variational block.
             qml.layer(ansatz, self.n_qlayers, weights, wires_type = wires_type)
 
