@@ -105,14 +105,20 @@ class QLSTM(nn.Module):
                 qml.RY(params[1][i], wires=wires_type[i])
                 qml.RZ(params[2][i], wires=wires_type[i])
                 
-        def VQC(features, weights, wires_type):
+                #--> instead: tensor network.
+                
+        def VQC(inputs, weights, wires_type):
             # Preproccess input data to encode the initial state.
             #qml.templates.AngleEmbedding(features, wires=wires_type)
-            ry_params = [torch.arctan(feature) for feature in features]
-            rz_params = [torch.arctan(feature**2) for feature in features]
-            print(f"Length of ry_params: {len(ry_params)}, Length of rz_params: {len(rz_params)}, Number of qubits: {self.n_qubits}")
+            # ry_params = [torch.arctan(feature) for feature in inputs]
+            # rz_params = [torch.arctan(feature**2) for feature in inputs]
+            # print(f"Length of ry_params: {len(ry_params)}, Length of rz_params: {len(rz_params)}, Number of qubits: {self.n_qubits}")
 
-            for i in range(self.features):
+            for i in range(self.n_qubits):
+                # print(i)
+                ry_params = [torch.arctan(input) for input in inputs]
+                rz_params = [torch.arctan(input**2) for input in inputs]
+                print(f"Length of ry_params: {len(ry_params)}, Length of rz_params: {len(rz_params)}, Number of qubits: {self.n_qubits}")
                 qml.Hadamard(wires=wires_type[i])
                 qml.RY(ry_params[i], wires=wires_type[i])
                 qml.RZ(rz_params[i], wires=wires_type[i])
@@ -128,6 +134,8 @@ class QLSTM(nn.Module):
 
         def _circuit_forget(inputs, weights):
             VQC(inputs, weights, self.wires_forget)
+            # qml.templates.AngleEmbedding(features, wires=wires_type)
+            # qml.layer(ansatz, self.n_qlayers, weights, wires_type = wires_type)
             return [qml.expval(qml.PauliZ(wires=i)) for i in self.wires_forget]
         self.qlayer_forget = qml.QNode(_circuit_forget, self.dev_forget, interface="torch")
 
