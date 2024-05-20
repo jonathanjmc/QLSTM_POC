@@ -114,8 +114,8 @@ class QLSTM(nn.Module):
             rz_params = [torch.arctan(feature**2) for feature in features]
             for i in range(self.n_qubits):
                 qml.Hadamard(wires=wires_type[i])
-                qml.RY(ry_params[i], wires=wires_type[i])
-                qml.RZ(rz_params[i], wires=wires_type[i])
+                qml.RY(ry_params[0][i], wires=wires_type[i])
+                qml.RZ(rz_params[0][i], wires=wires_type[i])
         
             #Variational block.
             qml.layer(ansatz, self.n_qlayers, weights, wires_type = wires_type)
